@@ -1,8 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "bndmNBr94L041SRqBhkQVLUffUl71YLYIO0oAfKyHW5oDhSl32jei0ZVKZda9Nyuveg5HhQ/JwG9Gw/TMna/lA==",
+  "dgSpecHash": "kCq9Myqz3X8hKRngxtphy+aczFkakb2LRJiRkJR1hg4iRgtZ3MsBsatP547BTM+Svai5UWmr0WT5hQSqIseWNQ==",
   "success": true,
   "projectFilePath": "/Users/kyoto/RiderProjects/FlyCheap/FlyCheap/FlyCheap.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "/Users/kyoto/.nuget/packages/newtonsoft.json/13.0.1/newtonsoft.json.13.0.1.nupkg.sha512",
+    "/Users/kyoto/.nuget/packages/telegram.bot/19.0.0/telegram.bot.19.0.0.nupkg.sha512"
+  ],
   "logs": []
 }
