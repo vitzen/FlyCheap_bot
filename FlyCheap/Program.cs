@@ -16,17 +16,33 @@ namespace FlyCheap
     {
         private static TelegramBotClient botClient;
 
-        public static void Main()
+        public static async Task Main()
         {
             // Тест коннекта с ботом TG
             botClient = new TelegramBotClient("5880963661:AAGGZLU75KJbrE_k-JPRckvCTR9ainZL1wE");
-            var me = botClient.GetMeAsync().Result;
+            var me = await botClient.GetMeAsync();
             Console.WriteLine($"Тест коннекта с ботом телеграмма \n" +
                               $"i'm user {me.Id} \n" +
                               $"my name is {me.FirstName} \n" +
                               $"username {me.Username}");
 
-            StartReceiver();
+            await StartReceiver();
+
+            ReplyKeyboardMarkup replyKeyboardMarkup = new(new[]
+            {
+                new KeyboardButton[] { "flight search" },
+                new KeyboardButton[] { "favorites️" },
+            })
+            {
+                ResizeKeyboard = true
+            };
+
+            // Message sentMessage = await botClient.SendTextMessageAsync(
+            //     chatId: null,
+            //     text: "Choose a response",
+            //     replyMarkup: replyKeyboardMarkup,
+            //     cancellationToken: null);
+
             Console.ReadLine();
         }
 
@@ -37,7 +53,7 @@ namespace FlyCheap
         {
             var token = new CancellationTokenSource();
             var canceltoken = token.Token;
-            var ReOpt = new ReceiverOptions() { AllowedUpdates = { } };
+            var ReOpt = new ReceiverOptions() { AllowedUpdates = { }, Limit = 99 };
             await botClient.ReceiveAsync(OnMessage, ErrorMessage, ReOpt, canceltoken);
         }
 
@@ -51,7 +67,7 @@ namespace FlyCheap
         {
             if (update.Message is Message message)
             {
-                SendMessage(message);
+                await SendMessage(message);
             }
         }
 
@@ -68,17 +84,19 @@ namespace FlyCheap
         {
             if (e is ApiRequestException requestException)
             {
-                await botClient.SendTextMessageAsync("", e.Message.ToString());
+                //await botClient.SendTextMessageAsync("", e.Message.ToString());
             }
+            Console.WriteLine($"{e.Message}");
         }
 
         /// <summary>
         /// Метод посыла сообщения от бота (ответ олт бота)
         /// </summary>
         /// <param name="message"></param>
-        public static async Task SendMessage(Message message)
+        public static async Task SendMessage(Message message, ReplyKeyboardMarkup replyKeyboardMarkup = null)
         {
-            await botClient.SendTextMessageAsync(message.Chat.Id, "Hello my Friend, I'm FlyCheap Service");
+            await botClient.SendTextMessageAsync(message.Chat.Id, "Hello my Friend, I'm FlyCheap Service",
+                replyMarkup: replyKeyboardMarkup);
         }
     }
 }
