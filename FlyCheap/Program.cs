@@ -19,7 +19,7 @@ namespace FlyCheap
         public static async Task Main()
         {
             // Тест коннекта с ботом TG
-            botClient = new TelegramBotClient("5880963661:AAGGZLU75KJbrE_k-JPRckvCTR9ainZL1wE");
+            botClient = new TelegramBotClient(Config.Token);
             var me = await botClient.GetMeAsync();
             Console.WriteLine($"Тест коннекта с ботом телеграмма \n" +
                               $"i'm user {me.Id} \n" +
@@ -27,15 +27,6 @@ namespace FlyCheap
                               $"username {me.Username}");
 
             await StartReceiver();
-
-            ReplyKeyboardMarkup replyKeyboardMarkup = new(new[]
-            {
-                new KeyboardButton[] { "flight search" },
-                new KeyboardButton[] { "favorites️" },
-            })
-            {
-                ResizeKeyboard = true
-            };
 
             // Message sentMessage = await botClient.SendTextMessageAsync(
             //     chatId: null,
@@ -86,6 +77,7 @@ namespace FlyCheap
             {
                 //await botClient.SendTextMessageAsync("", e.Message.ToString());
             }
+
             Console.WriteLine($"{e.Message}");
         }
 
