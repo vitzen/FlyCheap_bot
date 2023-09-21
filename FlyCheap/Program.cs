@@ -1,4 +1,4 @@
-﻿// Telegram bot logic for SkyCheap project
+﻿// Telegram bot SkyCheap - поиск дешевых авиарейсов
 
 using System;
 using System.Net.NetworkInformation;
@@ -19,7 +19,7 @@ namespace FlyCheap
 
         public static async Task Main()
         {
-            // Тест коннекта с ботом TG
+            // Тест коннекта с ботом TG / Прослушка работы бота
             botClient = new TelegramBotClient(Config.Token);
             var me = await botClient.GetMeAsync();
             Console.WriteLine($"Тест коннекта с ботом телеграмма \n" +
@@ -28,29 +28,23 @@ namespace FlyCheap
                               $"username {me.Username}");
 
             await StartReceiver();
-
-            // Message sentMessage = await botClient.SendTextMessageAsync(
-            //     chatId: null,
-            //     text: "Choose a response",
-            //     replyMarkup: replyKeyboardMarkup,
-            //     cancellationToken: null);
-
             Console.ReadLine();
         }
 
         /// <summary>
-        /// Метод SatrtReciever для запуска telegram бота
+        /// Метод StartReciever для запуска telegram бота
         /// </summary>
         public static async Task StartReceiver()
         {
             var token = new CancellationTokenSource();
-            var canceltoken = token.Token;
-            var ReOpt = new ReceiverOptions() { AllowedUpdates = { }, Limit = 99 };
-            await botClient.ReceiveAsync(OnMessage, ErrorMessage, ReOpt, canceltoken);
+            var cancellationToken = token.Token;
+            var reOpt = new ReceiverOptions() { AllowedUpdates = { }, Limit = 99 }; //Настройки получения обновлений 
+
+            await botClient.ReceiveAsync(OnMessage, ErrorMessage, reOpt, cancellationToken);
         }
 
         /// <summary>
-        /// Метод OnMessage
+        /// Метод для обработки обновлений бота
         /// </summary>
         /// <param name="botClient"></param>
         /// <param name="update"></param>
@@ -71,7 +65,7 @@ namespace FlyCheap
         }
 
         /// <summary>
-        /// Метод вывода ошибок Error
+        /// Метод для обработки ошибок
         /// </summary>
         /// <param name="botClient"></param>
         /// <param name="e"></param>
