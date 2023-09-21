@@ -1,6 +1,7 @@
 ﻿// Telegram bot logic for SkyCheap project
 
 using System;
+using System.Net.NetworkInformation;
 using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot;
@@ -59,6 +60,13 @@ namespace FlyCheap
             if (update.Message is Message message)
             {
                 await SendMessage(message);
+                return;
+            }
+
+            if (update.Type is UpdateType.CallbackQuery)
+            {
+                await CallbackQuery(botClient, update.CallbackQuery);
+                return;
             }
         }
 
@@ -75,14 +83,39 @@ namespace FlyCheap
         {
             if (e is ApiRequestException requestException)
             {
-                //await botClient.SendTextMessageAsync("", e.Message.ToString());
+                await botClient.SendTextMessageAsync("", e.Message.ToString());
             }
 
             Console.WriteLine($"{e.Message}");
         }
 
         /// <summary>
-        /// Метод посыла сообщения от бота (ответ олт бота)
+        /// Метод вызова inline-keyboard
+        /// </summary>
+        /// <param name="telegramBot"></param>
+        /// <param name="message"></param>
+        /// <param name="replyKeyboardMarkup"></param>
+        /// <param name="ReplyKeyboardMarkup"></param>
+        /// <param name="callbackQuery"></param>
+        public static async Task CallbackQuery(ITelegramBotClient telegramBot, Message message,
+            ReplyKeyboardMarkup replyKeyboardMarkup)
+        {
+            if (message.Text is "/start")
+            {
+                ReplyKeyboardMarkup keyboardMarkup = new(new[]
+                {
+                    new KeyboardButton[] { "1", "2" },
+                    new KeyboardButton[] { "3", "4" }
+                })
+                {
+                    ResizeKeyboard = true
+                };
+                await botClient.SendTextMessageAsync(message.Chat.Id, "CHOOSE: ");
+            }
+        }
+
+        /// <summary>
+        /// Метод посыла сообщения от бота (ответ от бота)
         /// </summary>
         /// <param name="message"></param>
         public static async Task SendMessage(Message message, ReplyKeyboardMarkup replyKeyboardMarkup = null)
