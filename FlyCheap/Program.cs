@@ -23,7 +23,7 @@ botClient.StartReceiving(
 
 var me = await botClient.GetMeAsync();
 
-Console.WriteLine($"Начал прослушку @{me.Username}");
+Console.WriteLine($"Start listening for @{me.Username}");
 Console.ReadLine();
 
 cts.Cancel();
@@ -49,20 +49,6 @@ async Task HandleMessage(ITelegramBotClient botClient, Message message)
 {
     if (message.Text == "/start")
     {
-        ReplyKeyboardMarkup keyboard = new(new[]
-        {
-            new KeyboardButton[] { "Search Flight", "My Flights" },
-            new KeyboardButton[] { "Restart", "Test" }
-        })
-        {
-            ResizeKeyboard = true
-        };
-        await botClient.SendTextMessageAsync(message.Chat.Id, "Выберите действие:", replyMarkup: keyboard);
-        return;
-    }
-
-    if (message.Text == "/inline")
-    {
         InlineKeyboardMarkup keyboard = new(new[]
         {
             new[]
@@ -73,16 +59,16 @@ async Task HandleMessage(ITelegramBotClient botClient, Message message)
             new[]
             {
                 InlineKeyboardButton.WithCallbackData("Restart", "restartBot"),
-                InlineKeyboardButton.WithCallbackData("Test", "test"),
+                InlineKeyboardButton.WithCallbackData("About", "about"),
             },
         });
-        await botClient.SendTextMessageAsync(message.Chat.Id, "Choose inline:", replyMarkup: keyboard);
+        await botClient.SendTextMessageAsync(message.Chat.Id, "Choose Button:", replyMarkup: keyboard);
         return;
     }
 
     //дефолтный ответ бота в случае неправильного ввода команды пользователем
     //await botClient.SendTextMessageAsync(message.Chat.Id, $"You said:\n{message.Text}");
-    await botClient.SendTextMessageAsync(message.Chat.Id, $"Для начала работы с ботом отправьте команду /start \n");
+    await botClient.SendTextMessageAsync(message.Chat.Id, $"To start working with the bot, send the command /start \n");
 }
 
 async Task HandleCallbackQuery(ITelegramBotClient botClient, CallbackQuery callbackQuery)
@@ -91,7 +77,7 @@ async Task HandleCallbackQuery(ITelegramBotClient botClient, CallbackQuery callb
     {
         await botClient.SendTextMessageAsync(
             callbackQuery.Message.Chat.Id,
-            $"Вы выбрали Search Flight"
+            $"You choose Search Flight"
         );
         return;
     }
@@ -100,7 +86,7 @@ async Task HandleCallbackQuery(ITelegramBotClient botClient, CallbackQuery callb
     {
         await botClient.SendTextMessageAsync(
             callbackQuery.Message.Chat.Id,
-            $"Вы выбрали My Flights"
+            $"You choose My Flights"
         );
         return;
     }
@@ -109,16 +95,16 @@ async Task HandleCallbackQuery(ITelegramBotClient botClient, CallbackQuery callb
     {
         await botClient.SendTextMessageAsync(
             callbackQuery.Message.Chat.Id,
-            $"Вы выбрали Restart"
+            $"You choose Restart"
         );
         return;
     }
 
-    if (callbackQuery.Data.StartsWith("test"))
+    if (callbackQuery.Data.StartsWith("about"))
     {
         await botClient.SendTextMessageAsync(
             callbackQuery.Message.Chat.Id,
-            $"Вы выбрали Test"
+            $"You choose About"
         );
         return;
     }
@@ -136,7 +122,7 @@ Task HandleErrorAsync(ITelegramBotClient client, Exception exception, Cancellati
     var ErrorMessage = exception switch
     {
         ApiRequestException apiRequestException
-            => $"Ошибка телеграм API:\n{apiRequestException.ErrorCode}\n{apiRequestException.Message}",
+            => $"Telegram API error:\n{apiRequestException.ErrorCode}\n{apiRequestException.Message}",
         _ => exception.ToString()
     };
     Console.WriteLine(ErrorMessage);
