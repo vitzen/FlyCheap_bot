@@ -1,121 +1,144 @@
-﻿// Telegram bot SkyCheap - поиск дешевых авиарейсов
-
-using System;
-using System.Net.NetworkInformation;
-using System.Threading;
-using System.Threading.Tasks;
-using Telegram.Bot;
+﻿using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace FlyCheap
+var botClient = new TelegramBotClient("5880963661:AAGGZLU75KJbrE_k-JPRckvCTR9ainZL1wE");
+
+using var cts = new CancellationTokenSource();
+
+var receiverOptions = new ReceiverOptions
 {
-    class Program
+    AllowedUpdates = { }
+};
+
+// Тест коннекта с ботом TG / Прослушка работы бота
+botClient.StartReceiving(
+    HandleUpdatesAsync,
+    HandleErrorAsync,
+    receiverOptions,
+    cancellationToken: cts.Token);
+
+var me = await botClient.GetMeAsync();
+
+Console.WriteLine($"Начал прослушку @{me.Username}");
+Console.ReadLine();
+
+cts.Cancel();
+
+//Метод для обработки обновлений бота
+async Task HandleUpdatesAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+{
+    if (update.Type == UpdateType.Message && update?.Message?.Text != null)
     {
-        private static TelegramBotClient botClient;
-
-        public static async Task Main()
-        {
-            // Тест коннекта с ботом TG / Прослушка работы бота
-            botClient = new TelegramBotClient(Config.Token);
-            var me = await botClient.GetMeAsync();
-            Console.WriteLine($"Тест коннекта с ботом телеграмма \n" +
-                              $"i'm user {me.Id} \n" +
-                              $"my name is {me.FirstName} \n" +
-                              $"username {me.Username}");
-
-            await StartReceiver();
-            Console.ReadLine();
-        }
-
-        /// <summary>
-        /// Метод StartReciever для запуска telegram бота
-        /// </summary>
-        public static async Task StartReceiver()
-        {
-            var token = new CancellationTokenSource();
-            var cancellationToken = token.Token;
-            var reOpt = new ReceiverOptions() { AllowedUpdates = { }, Limit = 99 }; //Настройки получения обновлений 
-
-            await botClient.ReceiveAsync(OnMessage, ErrorMessage, reOpt, cancellationToken);
-        }
-
-        /// <summary>
-        /// Метод для обработки обновлений бота
-        /// </summary>
-        /// <param name="botClient"></param>
-        /// <param name="update"></param>
-        /// <param name="cts"></param>
-        public static async Task OnMessage(ITelegramBotClient botClient, Update update, CancellationToken cancellation)
-        {
-            if (update.Message is Message message)
-            {
-                await SendMessage(message);
-                return;
-            }
-
-            if (update.Type is UpdateType.CallbackQuery)
-            {
-                await CallbackQuery(botClient, update.CallbackQuery);
-                return;
-            }
-        }
-
-        /// <summary>
-        /// Метод для обработки ошибок
-        /// </summary>
-        /// <param name="botClient"></param>
-        /// <param name="e"></param>
-        /// <param name="cts"></param>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public static async Task ErrorMessage(ITelegramBotClient telegramBot, Exception e,
-            CancellationToken cancelation)
-        {
-            if (e is ApiRequestException requestException)
-            {
-                await botClient.SendTextMessageAsync("", e.Message.ToString());
-            }
-
-            Console.WriteLine($"{e.Message}");
-        }
-
-        /// <summary>
-        /// Метод вызова inline-keyboard
-        /// </summary>
-        /// <param name="telegramBot"></param>
-        /// <param name="message"></param>
-        /// <param name="replyKeyboardMarkup"></param>
-        /// <param name="ReplyKeyboardMarkup"></param>
-        /// <param name="callbackQuery"></param>
-        public static async Task CallbackQuery(ITelegramBotClient telegramBot, Message message,
-            ReplyKeyboardMarkup replyKeyboardMarkup)
-        {
-            if (message.Text is "/start")
-            {
-                ReplyKeyboardMarkup keyboardMarkup = new(new[]
-                {
-                    new KeyboardButton[] { "1", "2" },
-                    new KeyboardButton[] { "3", "4" }
-                })
-                {
-                    ResizeKeyboard = true
-                };
-                await botClient.SendTextMessageAsync(message.Chat.Id, "CHOOSE: ");
-            }
-        }
-
-        /// <summary>
-        /// Метод посыла сообщения от бота (ответ от бота)
-        /// </summary>
-        /// <param name="message"></param>
-        public static async Task SendMessage(Message message, ReplyKeyboardMarkup replyKeyboardMarkup = null)
-        {
-            await botClient.SendTextMessageAsync(message.Chat.Id, "Hello my Friend, I'm FlyCheap Service",
-                replyMarkup: replyKeyboardMarkup);
-        }
+        await HandleMessage(botClient, update.Message);
+        return;
     }
+
+    if (update.Type == UpdateType.CallbackQuery)
+    {
+        await HandleCallbackQuery(botClient, update.CallbackQuery);
+        return;
+    }
+}
+
+//Метод ожидающий ввода пользователем команды
+async Task HandleMessage(ITelegramBotClient botClient, Message message)
+{
+    if (message.Text == "/start")
+    {
+        ReplyKeyboardMarkup keyboard = new(new[]
+        {
+            new KeyboardButton[] { "Search Flight", "My Flights" },
+            new KeyboardButton[] { "Restart", "Test" }
+        })
+        {
+            ResizeKeyboard = true
+        };
+        await botClient.SendTextMessageAsync(message.Chat.Id, "Выберите действие:", replyMarkup: keyboard);
+        return;
+    }
+
+    if (message.Text == "/inline")
+    {
+        InlineKeyboardMarkup keyboard = new(new[]
+        {
+            new[]
+            {
+                InlineKeyboardButton.WithCallbackData("Search Flight", "searchFlight"),
+                InlineKeyboardButton.WithCallbackData("My Flights", "myFlights"),
+            },
+            new[]
+            {
+                InlineKeyboardButton.WithCallbackData("Restart", "restartBot"),
+                InlineKeyboardButton.WithCallbackData("Test", "test"),
+            },
+        });
+        await botClient.SendTextMessageAsync(message.Chat.Id, "Choose inline:", replyMarkup: keyboard);
+        return;
+    }
+
+    //дефолтный ответ бота в случае неправильного ввода команды пользователем
+    //await botClient.SendTextMessageAsync(message.Chat.Id, $"You said:\n{message.Text}");
+    await botClient.SendTextMessageAsync(message.Chat.Id, $"Для начала работы с ботом отправьте команду /start \n");
+}
+
+async Task HandleCallbackQuery(ITelegramBotClient botClient, CallbackQuery callbackQuery)
+{
+    if (callbackQuery.Data.StartsWith("searchFlight"))
+    {
+        await botClient.SendTextMessageAsync(
+            callbackQuery.Message.Chat.Id,
+            $"Вы выбрали Search Flight"
+        );
+        return;
+    }
+
+    if (callbackQuery.Data.StartsWith("myFlights"))
+    {
+        await botClient.SendTextMessageAsync(
+            callbackQuery.Message.Chat.Id,
+            $"Вы выбрали My Flights"
+        );
+        return;
+    }
+
+    if (callbackQuery.Data.StartsWith("restartBot"))
+    {
+        await botClient.SendTextMessageAsync(
+            callbackQuery.Message.Chat.Id,
+            $"Вы выбрали Restart"
+        );
+        return;
+    }
+
+    if (callbackQuery.Data.StartsWith("test"))
+    {
+        await botClient.SendTextMessageAsync(
+            callbackQuery.Message.Chat.Id,
+            $"Вы выбрали Test"
+        );
+        return;
+    }
+
+    await botClient.SendTextMessageAsync(
+        callbackQuery.Message.Chat.Id,
+        $"You choose with data: {callbackQuery.Data}"
+    );
+    return;
+}
+
+//Метод для обработки ошибок (бота или API телеграмма)
+Task HandleErrorAsync(ITelegramBotClient client, Exception exception, CancellationToken cancellationToken)
+{
+    var ErrorMessage = exception switch
+    {
+        ApiRequestException apiRequestException
+            => $"Ошибка телеграм API:\n{apiRequestException.ErrorCode}\n{apiRequestException.Message}",
+        _ => exception.ToString()
+    };
+    Console.WriteLine(ErrorMessage);
+    return Task.CompletedTask;
 }
