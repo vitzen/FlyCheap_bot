@@ -1,11 +1,15 @@
-﻿using Telegram.Bot;
+﻿using FlyCheap;
+using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 
-var botClient = new TelegramBotClient("5880963661:AAGGZLU75KJbrE_k-JPRckvCTR9ainZL1wE");
+//Словарь, хранящий Id чата и класс, где описано состояние SearchState
+var userSearchState = new Dictionary<long, StateMachine>();
+
+var botClient = new TelegramBotClient(Configuration.Token);
 
 using var cts = new CancellationTokenSource();
 
@@ -17,7 +21,7 @@ var receiverOptions = new ReceiverOptions
 // Тест коннекта с ботом TG / Прослушка работы бота
 botClient.StartReceiving(
     HandleUpdatesAsync,
-    HandleErrorAsync,
+    Exceptions.HandleErrorAsync,
     receiverOptions,
     cancellationToken: cts.Token);
 
@@ -42,14 +46,25 @@ async Task HandleUpdatesAsync(ITelegramBotClient botClient, Update update, Cance
         await HandleCallbackQuery(botClient, update.CallbackQuery);
         return;
     }
+
+    if (userSearchState.TryGetValue(ChatId, StateMachine state))
+    {
+        
+    }
+    else
+    {
+        userSearchState[ChatId] = new StateMachine();
+    }
 }
 
-//Метод ожидающий ввода пользователем команды
+//Метод ожидающий ввода пользователем команды c inline клавиатуры
 async Task HandleMessage(ITelegramBotClient botClient, Message message)
 {
     if (message.Text == "/start")
     {
-        InlineKeyboardMarkup keyboard = new(new[]
+        #region [Main menu]
+
+        InlineKeyboardMarkup mainMenu = new(new[]
         {
             new[]
             {
@@ -62,7 +77,10 @@ async Task HandleMessage(ITelegramBotClient botClient, Message message)
                 InlineKeyboardButton.WithCallbackData("About", "about"),
             },
         });
-        await botClient.SendTextMessageAsync(message.Chat.Id, "Choose Button:", replyMarkup: keyboard);
+
+        #endregion
+
+        await botClient.SendTextMessageAsync(message.Chat.Id, "Choose Button:", replyMarkup: mainMenu);
         return;
     }
 
@@ -118,17 +136,4 @@ async Task HandleCallbackQuery(ITelegramBotClient botClient, CallbackQuery callb
         $"You choose with data: {callbackQuery.Data}"
     );
     return;
-}
-
-//Метод для обработки ошибок (бота или API телеграмма)
-Task HandleErrorAsync(ITelegramBotClient client, Exception exception, CancellationToken cancellationToken)
-{
-    var ErrorMessage = exception switch
-    {
-        ApiRequestException apiRequestException
-            => $"Telegram API error:\n{apiRequestException.ErrorCode}\n{apiRequestException.Message}",
-        _ => exception.ToString()
-    };
-    Console.WriteLine(ErrorMessage);
-    return Task.CompletedTask;
 }
