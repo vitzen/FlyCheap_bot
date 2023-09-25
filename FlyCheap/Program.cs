@@ -24,7 +24,7 @@ botClient.StartReceiving(
 var me = await botClient.GetMeAsync();
 
 Console.WriteLine($"Start listening for @{me.Username}");
-Console.ReadLine();
+await Task.Delay(Int32.MaxValue);
 
 cts.Cancel();
 
@@ -67,21 +67,23 @@ async Task HandleMessage(ITelegramBotClient botClient, Message message)
     }
 
     //дефолтный ответ бота в случае неправильного ввода команды пользователем
-    //await botClient.SendTextMessageAsync(message.Chat.Id, $"You said:\n{message.Text}");
     await botClient.SendTextMessageAsync(message.Chat.Id, $"To start working with the bot, send the command /start \n");
 }
 
+//Метод обрабатывающий нажатие определенной кнопки inline клавиатуры
 async Task HandleCallbackQuery(ITelegramBotClient botClient, CallbackQuery callbackQuery)
 {
+    //Поиск авиабилетов ----->>>>>>>>>>>>>>>>>>>>>>>>
     if (callbackQuery.Data.StartsWith("searchFlight"))
     {
         await botClient.SendTextMessageAsync(
             callbackQuery.Message.Chat.Id,
-            $"You choose Search Flight"
+            $"Enter the city of departure"
         );
         return;
     }
 
+    //Мои рейсы/избранное ----->>>>>>>>>>>>>>>>>>>>>>
     if (callbackQuery.Data.StartsWith("myFlights"))
     {
         await botClient.SendTextMessageAsync(
@@ -91,6 +93,7 @@ async Task HandleCallbackQuery(ITelegramBotClient botClient, CallbackQuery callb
         return;
     }
 
+    //Перезапуск бота ----->>>>>>>>>>>>>>>>>>>>>>>>>
     if (callbackQuery.Data.StartsWith("restartBot"))
     {
         await botClient.SendTextMessageAsync(
@@ -100,6 +103,7 @@ async Task HandleCallbackQuery(ITelegramBotClient botClient, CallbackQuery callb
         return;
     }
 
+    //Мануал по работе с ботом ----->>>>>>>>>>>>>>>>
     if (callbackQuery.Data.StartsWith("about"))
     {
         await botClient.SendTextMessageAsync(
