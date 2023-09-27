@@ -1,4 +1,5 @@
 ﻿using FlyCheap;
+using FlyCheap.State.Models;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
@@ -7,7 +8,7 @@ using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 
 //Словарь, хранящий Id чата и класс, где описано состояние SearchState
-var userSearchState = new Dictionary<long, StateMachine>();
+var userSearchState = new Dictionary<long, UserRoles>();
 
 var botClient = new TelegramBotClient(Configuration.Token);
 
@@ -47,20 +48,19 @@ async Task HandleUpdatesAsync(ITelegramBotClient botClient, Update update, Cance
         return;
     }
 
-    if (userSearchState.TryGetValue(ChatId, StateMachine state))
-    {
-        
-    }
-    else
-    {
-        userSearchState[ChatId] = new StateMachine();
-    }
+    // if (userSearchState.TryGetValue(ChatId, StateMachine state))
+    // {
+    // }
+    // else
+    // {
+    //     userSearchState[ChatId] = new StateMachine();
+    // }
 }
 
 //Метод ожидающий ввода пользователем команды c inline клавиатуры
 async Task HandleMessage(ITelegramBotClient botClient, Message message)
 {
-    if (message.Text == "/start")
+    if (message.Text.ToLower() == "/start")
     {
         #region [Main menu]
 
@@ -74,7 +74,6 @@ async Task HandleMessage(ITelegramBotClient botClient, Message message)
             new[]
             {
                 InlineKeyboardButton.WithCallbackData("Restart", "restartBot"),
-                InlineKeyboardButton.WithCallbackData("About", "about"),
             },
         });
 
@@ -117,16 +116,6 @@ async Task HandleCallbackQuery(ITelegramBotClient botClient, CallbackQuery callb
         await botClient.SendTextMessageAsync(
             callbackQuery.Message.Chat.Id,
             $"You choose Restart"
-        );
-        return;
-    }
-
-    //Мануал по работе с ботом ----->>>>>>>>>>>>>>>>
-    if (callbackQuery.Data.StartsWith("about"))
-    {
-        await botClient.SendTextMessageAsync(
-            callbackQuery.Message.Chat.Id,
-            $"You choose About"
         );
         return;
     }
