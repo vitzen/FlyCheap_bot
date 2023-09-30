@@ -8,7 +8,7 @@ using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 
 //Словарь, хранящий Id чата и класс, где описано состояние SearchState
-var userSearchState = new Dictionary<long, UserRoles>();
+//var userSearchState = new Dictionary<long, UserRoles>();
 
 var botClient = new TelegramBotClient(Configuration.Token);
 
@@ -47,19 +47,14 @@ async Task HandleUpdatesAsync(ITelegramBotClient botClient, Update update, Cance
         await HandleCallbackQuery(botClient, update.CallbackQuery);
         return;
     }
-
-    // if (userSearchState.TryGetValue(ChatId, StateMachine state))
-    // {
-    // }
-    // else
-    // {
-    //     userSearchState[ChatId] = new StateMachine();
-    // }
 }
 
 //Метод ожидающий ввода пользователем команды c inline клавиатуры
 async Task HandleMessage(ITelegramBotClient botClient, Message message)
 {
+    var tgId = message.From.Id;
+    var user = UserUtils.GetOrCreate(tgId);
+    
     if (message.Text.ToLower() == "/start")
     {
         #region [Main menu]
@@ -90,6 +85,8 @@ async Task HandleMessage(ITelegramBotClient botClient, Message message)
 //Метод обрабатывающий нажатие определенной кнопки inline клавиатуры
 async Task HandleCallbackQuery(ITelegramBotClient botClient, CallbackQuery callbackQuery)
 {
+    await botClient.AnswerCallbackQueryAsync(callbackQuery.Id);
+
     //Поиск авиабилетов ----->>>>>>>>>>>>>>>>>>>>>>>>
     if (callbackQuery.Data.StartsWith("searchFlight"))
     {

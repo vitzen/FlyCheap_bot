@@ -2,12 +2,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace FlyCheap.State.Models;
 
-public class UserRoles
+public class User
 {
     [Key]
     public long TgId { get; set; }
-    public string Role { get; set; }
+    public Role Role { get; set; }
     public string TgUsername { get; set; }
-    public long TgChatId { get; set; }
-    public int StageReg { get; set; }
+    public bool IsRegistered { get; set; }
 }
