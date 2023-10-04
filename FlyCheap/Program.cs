@@ -1,5 +1,4 @@
 ﻿using FlyCheap;
-using FlyCheap.SearchLogic;
 using FlyCheap.State.Models;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
@@ -157,4 +156,3 @@ async Task HandleCallbackQuery(ITelegramBotClient botClient, CallbackQuery callb
 Сделать GUID
 Сделать обертку всем методам botclient.SendMessageTextAsync
     и callback методам
-    
