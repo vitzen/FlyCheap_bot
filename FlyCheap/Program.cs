@@ -1,4 +1,5 @@
 ﻿using FlyCheap;
+using FlyCheap.Collections;
 using FlyCheap.State.Models;
 using FlyCheap.UI;
 using Telegram.Bot;
@@ -71,7 +72,7 @@ async Task HandleCommandMessage(ITelegramBotClient botClient, Message message)
             if (message.Text != null && message.Text == "moscow")
             {
                 user.InputState = InputState.ArrivalСity;
-                var fly =
+                
                     await botClient.SendTextMessageAsync(tgId, "вы ввели москва, теперь введите город назначения:");
 
                 return;
@@ -131,6 +132,7 @@ async Task HandleCallbackQuery(ITelegramBotClient botClient, CallbackQuery callb
 
         user.InputState = InputState.DepartureСity;
         var fly = new Fly(tgId);
+        FlightsList.flights.Add(fly);
         return;
     }
 
