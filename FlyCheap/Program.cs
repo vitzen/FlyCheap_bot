@@ -68,15 +68,37 @@ async Task HandleCommandMessage(ITelegramBotClient botClient, Message message)
     {
         if (user.InputState == InputState.DepartureСity)
         {
-            //1. Попытаться спарсить текст в город (Город берем из листа)
-            //1.1 если не получилось - ничего не меняя просим пользователя ввести еще раз, так как город не найден
-            //2. Если найден -
-            //2.1 изменить его state на arrival city
-            //2.2 найти объект fly по user tg id и заполнить departure city
-            //2.3 попросить пользователя ввести город назначения
+            if (message.Text != null && message.Text == "moscow")
+            {
+                user.InputState = InputState.ArrivalСity;
+                var fly =
+                    await botClient.SendTextMessageAsync(tgId, "вы ввели москва, теперь введите город назначения:");
+
+                return;
+            }
+            else
+            {
+                user.InputState = InputState.DepartureСity;
+                await botClient.SendTextMessageAsync(tgId, "Город отправления не найден - повторите ввод:");
+            }
         }
 
         if (user.InputState == InputState.ArrivalСity)
+        {
+            if (message.Text != null && message.Text == "voronez")
+            {
+                await botClient.SendTextMessageAsync(tgId, "вы ввели воронеж, теперь введите дату отправления:");
+                user.InputState = InputState.DepartureDate;
+                return;
+            }
+            else
+            {
+                await botClient.SendTextMessageAsync(tgId, "Город прибытия не найден - повторите ввод:");
+                user.InputState = InputState.ArrivalСity;
+            }
+        }
+
+        if (user.InputState == InputState.DepartureDate)
         {
             // Все аналогично только следующий шаг  
         }
@@ -90,6 +112,7 @@ async Task HandleCommandMessage(ITelegramBotClient botClient, Message message)
     await botClient.SendTextMessageAsync(tgId, $"To start working with the bot, send the command /start \n");
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Метод обрабатывающий нажатие определенной кнопки inline клавиатуры
 async Task HandleCallbackQuery(ITelegramBotClient botClient, CallbackQuery callbackQuery)
 {
@@ -107,7 +130,7 @@ async Task HandleCallbackQuery(ITelegramBotClient botClient, CallbackQuery callb
         );
 
         user.InputState = InputState.DepartureСity;
-        создать и сохранить объект fly c заполненным полем user tg id
+        var fly = new Fly(tgId);
         return;
     }
 
@@ -138,8 +161,8 @@ async Task HandleCallbackQuery(ITelegramBotClient botClient, CallbackQuery callb
     return;
 }
 
-Метод который принимает обект fly и возвращает строку с найденными билетами
-    Эту строку кинуть пользователю после успешного парсинга
-Сделать GUID
-Сделать обертку всем методам botclient.SendMessageTextAsync
-    и callback методам
+// Метод который принимает обект fly и возвращает строку с найденными билетами
+//     Эту строку кинуть пользователю после успешного парсинга
+// Сделать GUID
+// Сделать обертку всем методам botclient.SendMessageTextAsync
+//     и callback методам
