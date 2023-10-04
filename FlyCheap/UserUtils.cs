@@ -12,6 +12,17 @@ public static class UserUtils
         {
             return user;
         }
-        var newUser = Context.Users.
+
+        user = new User()
+        {
+            TgId = tgId,
+            Role = Role.User,
+            IsRegistered = true,
+            InputState = InputState.Nothing
+        };
+        Context.Users.Add(user);
+        return user;
     }
 }
+
+
