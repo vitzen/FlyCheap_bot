@@ -1,3 +1,5 @@
+using FlyCheap.State.Models;
+
 namespace FlyCheap.Collections;
 
 public static class Сities
@@ -11,6 +13,3 @@ public static class Сities
         "sochi"
     };
 }
-
-
-

@@ -69,12 +69,20 @@ async Task HandleCommandMessage(ITelegramBotClient botClient, Message message)
     {
         if (user.InputState == InputState.DepartureСity)
         {
-            if (message.Text != null && message.Text == "moscow")
+            if (message.Text != null && message.Text.ToLower().StartsWith("moscow"))
             {
-                user.InputState = InputState.ArrivalСity;
                 
-                    await botClient.SendTextMessageAsync(tgId, "вы ввели москва, теперь введите город назначения:");
+                var flight = FlightsList.flights
+                    .Where(x => x.UserTgId == tgId)
+                    .Where(x => x.DepartureСity == null)
+                    .FirstOrDefault();
+                
+                flight.DepartureСity = Cities.cities
+               //Через линк записываем в объект fly departure city    
+                
 
+                await botClient.SendTextMessageAsync(tgId, "вы ввели москва, теперь введите город назначения:");
+                user.InputState = InputState.ArrivalСity;
                 return;
             }
             else
@@ -86,8 +94,18 @@ async Task HandleCommandMessage(ITelegramBotClient botClient, Message message)
 
         if (user.InputState == InputState.ArrivalСity)
         {
-            if (message.Text != null && message.Text == "voronez")
+            if (message.Text != null && message.Text.ToLower().StartsWith("voronez"))
             {
+                
+                
+                var flight = FlightsList.flights
+                    .Where(x => x.UserTgId == tgId)
+                    .Where(x => x.ArrivalСity == null)
+                    .FirstOrDefault();
+                
+                flight.ArrivalСity = Cities.cities
+                //Через линк записываем в объект fly arrival city   
+                
                 await botClient.SendTextMessageAsync(tgId, "вы ввели воронеж, теперь введите дату отправления:");
                 user.InputState = InputState.DepartureDate;
                 return;
