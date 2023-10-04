@@ -4,16 +4,20 @@ namespace FlyCheap.UI;
 
 public static class MainMenu
 {
-    static InlineKeyboardMarkup mainMenu = new(new[]
+    public static IReplyMarkup? GetMainMenu()
     {
-        new[]
+        InlineKeyboardMarkup mainMenu = new(new[]
         {
-            InlineKeyboardButton.WithCallbackData("Search Flight", "searchFlight"),
-            InlineKeyboardButton.WithCallbackData("My Flights", "myFlights"),
-        },
-        new[]
-        {
-            InlineKeyboardButton.WithCallbackData("Restart", "restartBot"),
-        },
-    });
+            new[]
+            {
+                InlineKeyboardButton.WithCallbackData("Search Flight", "searchFlight"),
+                InlineKeyboardButton.WithCallbackData("My Flights", "myFlights"),
+            },
+            new[]
+            {
+                InlineKeyboardButton.WithCallbackData("Restart", "restartBot"),
+            },
+        });
+        return mainMenu;
+    }
 }

@@ -60,8 +60,7 @@ async Task HandleCommandMessage(ITelegramBotClient botClient, Message message)
 
     if (text == "/start")
     {
-        IReplyMarkup? mainMenu = null;
-        await botClient.SendTextMessageAsync(tgId, "Choose Button:", replyMarkup: mainMenu);
+        await botClient.SendTextMessageAsync(tgId, "Choose Button:", replyMarkup: MainMenu.GetMainMenu());
         return;
     }
 
