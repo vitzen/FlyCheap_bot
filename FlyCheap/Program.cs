@@ -1,5 +1,6 @@
 ﻿using FlyCheap;
 using FlyCheap.State.Models;
+using FlyCheap.UI;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
@@ -59,21 +60,8 @@ async Task HandleCommandMessage(ITelegramBotClient botClient, Message message)
 
     if (text == "/start")
     {
-        InlineKeyboardMarkup mainMenu = new(new[]
-        {
-            new[]
-            {
-                InlineKeyboardButton.WithCallbackData("Search Flight", "searchFlight"),
-                InlineKeyboardButton.WithCallbackData("My Flights", "myFlights"),
-            },
-            new[]
-            {
-                InlineKeyboardButton.WithCallbackData("Restart", "restartBot"),
-            },
-        });
-
+        IReplyMarkup? mainMenu = null;
         await botClient.SendTextMessageAsync(tgId, "Choose Button:", replyMarkup: mainMenu);
-        //await botClient.SendTextMessageAsync(tgId, "Choose Button:", replyMarkup: GetMainMenu());
         return;
     }
 
