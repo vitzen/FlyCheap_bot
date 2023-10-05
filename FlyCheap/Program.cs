@@ -77,6 +77,8 @@ async Task HandleCommandMessage(ITelegramBotClient botClient, Message message)
                     .Where(x => x.DepartureСity == null)
                     .FirstOrDefault();
                 
+                Guid id = Guid.NewGuid();
+
                 flight.DepartureСity = Cities.cities
                //Через линк записываем в объект fly departure city    
                 
@@ -186,3 +188,8 @@ async Task HandleCallbackQuery(ITelegramBotClient botClient, CallbackQuery callb
 // Сделать GUID
 // Сделать обертку всем методам botclient.SendMessageTextAsync
 //     и callback методам
+
+async Task GetFinalTickets(Fly fly)
+{
+    return  "!!!!!!";
+}
