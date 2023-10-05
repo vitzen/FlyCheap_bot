@@ -67,21 +67,20 @@ async Task HandleCommandMessage(ITelegramBotClient botClient, Message message)
 
     if (user.InputState != InputState.Nothing)
     {
+        ////////////////////////////////////////////////////////////////////////////////////// ПАРСИМ ГОРОД ОТПРАВЛЕНИЯ
         if (user.InputState == InputState.DepartureСity)
         {
             if (message.Text != null && message.Text.ToLower().StartsWith("moscow"))
             {
-                
                 var flight = FlightsList.flights
                     .Where(x => x.UserTgId == tgId)
                     .Where(x => x.DepartureСity == null)
                     .FirstOrDefault();
-                
-                Guid id = Guid.NewGuid();
 
-                flight.DepartureСity = Cities.cities
-               //Через линк записываем в объект fly departure city    
-                
+                Guid guidId = Guid.NewGuid();
+
+                flight.DepartureСity = CitiesCollection.cities.Where(x => x.ToLower().Contains("moscow"));
+                flight.Id = guidId;
 
                 await botClient.SendTextMessageAsync(tgId, "вы ввели москва, теперь введите город назначения:");
                 user.InputState = InputState.ArrivalСity;
@@ -94,21 +93,20 @@ async Task HandleCommandMessage(ITelegramBotClient botClient, Message message)
             }
         }
 
+        ////////////////////////////////////////////////////////////////////////////////////// ПАРСИМ ГОРОД ПРИБЫТИЯ
         if (user.InputState == InputState.ArrivalСity)
         {
             if (message.Text != null && message.Text.ToLower().StartsWith("voronez"))
             {
-                
-                
                 var flight = FlightsList.flights
                     .Where(x => x.UserTgId == tgId)
                     .Where(x => x.ArrivalСity == null)
                     .FirstOrDefault();
-                
-                flight.ArrivalСity = Cities.cities
-                //Через линк записываем в объект fly arrival city   
-                
-                await botClient.SendTextMessageAsync(tgId, "вы ввели воронеж, теперь введите дату отправления:");
+
+                flight.ArrivalСity = CitiesCollection.cities.Where(x => x.ToLower().Contains("voronez"));
+
+                await botClient.SendTextMessageAsync(tgId, "вы ввели воронеж, " +
+                                                           "теперь введите дату отправления в формате  XX.XX.XXXX:");
                 user.InputState = InputState.DepartureDate;
                 return;
             }
@@ -119,9 +117,15 @@ async Task HandleCommandMessage(ITelegramBotClient botClient, Message message)
             }
         }
 
+        ////////////////////////////////////////////////////////////////////////////////////// ПАРСИМ ДАТУ ВЫЛЕТА
         if (user.InputState == InputState.DepartureDate)
         {
-            // Все аналогично только следующий шаг  
+            var flight = FlightsList.flights
+                .Where(x => x.UserTgId == tgId)
+                .Where(x => x.DepartureDate == null)
+                .FirstOrDefault();
+
+            flight.DepartureDate = CitiesCollection.cities.Where(x => x.ToLower().Contains(""));
         }
 
         //Дату спарсить до datetime
@@ -133,7 +137,6 @@ async Task HandleCommandMessage(ITelegramBotClient botClient, Message message)
     await botClient.SendTextMessageAsync(tgId, $"To start working with the bot, send the command /start \n");
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Метод обрабатывающий нажатие определенной кнопки inline клавиатуры
 async Task HandleCallbackQuery(ITelegramBotClient botClient, CallbackQuery callbackQuery)
 {
@@ -191,5 +194,5 @@ async Task HandleCallbackQuery(ITelegramBotClient botClient, CallbackQuery callb
 
 async Task GetFinalTickets(Fly fly)
 {
-    return  "!!!!!!";
+    return "!!!!!!";
 }
