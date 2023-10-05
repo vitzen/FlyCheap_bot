@@ -4,7 +4,7 @@ namespace FlyCheap.State.Models;
 
 public class Fly
 {
-    [Key] public Guid Id { get; set; }
+    public Guid Id { get; set; }
     public IEnumerable<string> DepartureСity { get; set; }
     public IEnumerable<string> ArrivalСity { get; set; }
     public IEnumerable<string> DepartureDate { get; set; }

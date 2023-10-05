@@ -4,7 +4,7 @@ namespace FlyCheap.State.Models;
 
 public class User
 {
-    [Key] public long TgId { get; set; }
+    public long TgId { get; set; }
     public Role Role { get; set; }
     public InputState InputState { get; set; }
     public string TgUsername { get; set; }

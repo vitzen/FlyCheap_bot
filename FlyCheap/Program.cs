@@ -188,11 +188,10 @@ async Task HandleCallbackQuery(ITelegramBotClient botClient, CallbackQuery callb
 
 // Метод который принимает обект fly и возвращает строку с найденными билетами
 //     Эту строку кинуть пользователю после успешного парсинга
-// Сделать GUID
 // Сделать обертку всем методам botclient.SendMessageTextAsync
 //     и callback методам
 
-async Task GetFinalTickets(Fly fly)
+async Task<string> GetFinalTickets(Fly fly)
 {
-    return "!!!!!!";
+    return "";
 }
