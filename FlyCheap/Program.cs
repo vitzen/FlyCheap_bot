@@ -8,6 +8,7 @@ using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
+using System.Linq;
 
 #region
 
@@ -70,7 +71,13 @@ async Task HandleCommandMessage(ITelegramBotClient botClient, Message message)
         ////////////////////////////////////////////////////////////////////////////////////// ПАРСИМ ГОРОД ОТПРАВЛЕНИЯ
         if (user.InputState == InputState.DepartureСity)
         {
-            if (message.Text != null && message.Text.ToLower().StartsWith("moscow"))
+            var cityFromMessage = message.Text.ToLower();
+            var selectedCityFromList = CitiesCollection.cities
+                .Where(x => x.Contains(cityFromMessage))
+                .First()
+                .ToString();
+            
+            if (selectedCityFromList != null)
             {
                 var flight = FlightsList.flights
                     .Where(x => x.UserTgId == tgId)
@@ -79,10 +86,10 @@ async Task HandleCommandMessage(ITelegramBotClient botClient, Message message)
 
                 Guid guidId = Guid.NewGuid();
 
-                flight.DepartureСity = CitiesCollection.cities.Where(x => x.ToLower().Contains("moscow"));
+                flight.DepartureСity = cityFromMessage;
                 flight.Id = guidId;
 
-                await botClient.SendTextMessageAsync(tgId, "вы ввели москва, теперь введите город назначения:");
+                await botClient.SendTextMessageAsync(tgId, $"ваш город отправления {cityFromMessage}, теперь введите город назначения:");
                 user.InputState = InputState.ArrivalСity;
                 return;
             }
@@ -96,16 +103,22 @@ async Task HandleCommandMessage(ITelegramBotClient botClient, Message message)
         ////////////////////////////////////////////////////////////////////////////////////// ПАРСИМ ГОРОД ПРИБЫТИЯ
         if (user.InputState == InputState.ArrivalСity)
         {
-            if (message.Text != null && message.Text.ToLower().StartsWith("voronez"))
+            var cityFromMessage = message.Text.ToLower();
+            var selectedCityFromList = CitiesCollection.cities
+                .Where(x => x.Contains(cityFromMessage))
+                .First()
+                .ToString();
+                
+            if (selectedCityFromList != null)
             {
                 var flight = FlightsList.flights
                     .Where(x => x.UserTgId == tgId)
                     .Where(x => x.ArrivalСity == null)
                     .FirstOrDefault();
 
-                flight.ArrivalСity = CitiesCollection.cities.Where(x => x.ToLower().Contains("voronez"));
+                flight.ArrivalСity = cityFromMessage;
 
-                await botClient.SendTextMessageAsync(tgId, "вы ввели воронеж, " +
+                await botClient.SendTextMessageAsync(tgId, $"город прибытия {cityFromMessage}, " +
                                                            "теперь введите дату отправления в формате  XX.XX.XXXX:");
                 user.InputState = InputState.DepartureDate;
                 return;
