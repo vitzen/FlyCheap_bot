@@ -161,10 +161,6 @@ async Task HandleCommandMessage(ITelegramBotClient botClient, Message message)
             await botClient.SendTextMessageAsync(tgId, "дата вылета введена неверно - повторите ввод:");
             user.InputState = InputState.DepartureDate;
         }
-
-        //Дату спарсить до datetime
-        DateTime.Parse("Спарсим");
-        //DateTime.Now.ToString (взять только дату)
     }
 
 //дефолтный ответ бота в случае неправильного ввода команды пользователем
@@ -223,5 +219,5 @@ async Task HandleCallbackQuery(ITelegramBotClient botClient, CallbackQuery callb
 //Метод вывода найденных результатов по авиарейсам
 async Task<string> GetFinalTickets(Fly fly)
 {
-    return "Билеты найдены";
+    return "Билеты найдены!!!";
 }
