@@ -136,22 +136,22 @@ async Task HandleCommandMessage(ITelegramBotClient botClient, Message message)
         {
             var dateFromMessage = message.Text;
             var parsedDate = DateTime.Parse(dateFromMessage);
-            
-            if (message.Text != null)
-            if (dateFromMessage != null)
-            {
-                var flight = FlightsList.flights
-                    .Where(x => x.UserTgId == tgId)
-                    .Where(x => x.DepartureDate == null)
-                    .FirstOrDefault();
 
-                flight.DepartureDate = "";
-            }
+            if (message.Text != null)
+                if (dateFromMessage != null)
+                {
+                    var flight = FlightsList.flights
+                        .Where(x => x.UserTgId == tgId)
+                        .Where(x => x.DepartureDate == null)
+                        .FirstOrDefault();
+
+                    flight.DepartureDate = parsedDate;
+                }
 
             await botClient.SendTextMessageAsync(tgId, "Ваша дата вылета ");
             user.InputState = InputState.FullState;
-            
-            
+
+
             var result = GetFinalTickets();
             return;
         }
@@ -225,8 +225,3 @@ async Task<string> GetFinalTickets(Fly fly)
 {
     return "Билеты найдены";
 }
-
-// Метод который принимает обект fly и возвращает строку с найденными билетами
-//     Эту строку кинуть пользователю после успешного парсинга
-// Сделать обертку всем методам botclient.SendMessageTextAsync
-//     и callback методам
