@@ -11,21 +11,23 @@ public class Fly
     public int PassengersNumber { get; set; } = 1; //Количество пассажиров
     public int TransfersNumber { get; set; } = 0; //Количество пересадок
     public long UserTgId { get; set; }
-    public string resultTickets;
+    public string resultTickets = null;
 
     public Fly(long tgId)
     {
-        throw new NotImplementedException();
+        Id = Guid.NewGuid();
+        UserTgId = tgId;
     }
 
-    public Fly(Guid id, string departureСity, string arrivalСity, DateTime departureDate, int passengersNumber, int transfersNumber, long userTgId)
-    {
-        Id = id;
-        DepartureСity = departureСity;
-        ArrivalСity = arrivalСity;
-        DepartureDate = departureDate;
-        PassengersNumber = passengersNumber;
-        TransfersNumber = transfersNumber;
-        UserTgId = userTgId;
-    }
+    // public Fly(string departureСity, string arrivalСity, DateTime departureDate, int passengersNumber,
+    //     int transfersNumber, long userTgId)
+    // {
+    //     Id = Guid.NewGuid();
+    //     DepartureСity = departureСity;
+    //     ArrivalСity = arrivalСity;
+    //     DepartureDate = departureDate;
+    //     PassengersNumber = passengersNumber;
+    //     TransfersNumber = transfersNumber;
+    //     UserTgId = userTgId;
+    // }
 }

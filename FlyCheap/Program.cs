@@ -18,7 +18,8 @@ using var cts = new CancellationTokenSource();
 
 var receiverOptions = new ReceiverOptions
 {
-    AllowedUpdates = { }
+    AllowedUpdates = { }, 
+    ThrowPendingUpdates = true
 };
 
 // Тест коннекта с ботом TG / Прослушка работы бота
@@ -73,21 +74,14 @@ async Task HandleCommandMessage(ITelegramBotClient botClient, Message message)
         {
             var cityFromMessage = message.Text.ToLower();
             var selectedCityFromList = CitiesCollection.cities
-                .Where(x => x.Contains(cityFromMessage))
-                .First()
-                .ToString();
+                .FirstOrDefault(x => x.Contains(cityFromMessage));
 
             if (selectedCityFromList != null)
             {
                 var flight = FlightsList.flights
-                    .Where(x => x.UserTgId == tgId)
-                    .Where(x => x.DepartureСity == null)
-                    .FirstOrDefault();
-
-                Guid guidId = Guid.NewGuid();
+                    .First(x => x.UserTgId == tgId && x.resultTickets == null);
 
                 flight.DepartureСity = cityFromMessage;
-                flight.Id = guidId;
 
                 await botClient.SendTextMessageAsync(tgId,
                     $"ваш город отправления {cityFromMessage}, теперь введите город назначения:");
@@ -96,7 +90,6 @@ async Task HandleCommandMessage(ITelegramBotClient botClient, Message message)
             }
             else
             {
-                user.InputState = InputState.DepartureСity;
                 await botClient.SendTextMessageAsync(tgId, "Город отправления не найден - повторите ввод:");
             }
         }
@@ -106,16 +99,12 @@ async Task HandleCommandMessage(ITelegramBotClient botClient, Message message)
         {
             var cityFromMessage = message.Text.ToLower();
             var selectedCityFromList = CitiesCollection.cities
-                .Where(x => x.Contains(cityFromMessage))
-                .First()
-                .ToString();
+                .First(x => x.Contains(cityFromMessage));
 
             if (selectedCityFromList != null)
             {
                 var flight = FlightsList.flights
-                    .Where(x => x.UserTgId == tgId)
-                    .Where(x => x.ArrivalСity == null)
-                    .FirstOrDefault();
+                    .First(x => x.UserTgId == tgId && x.resultTickets == null);
 
                 flight.ArrivalСity = cityFromMessage;
 
@@ -127,7 +116,6 @@ async Task HandleCommandMessage(ITelegramBotClient botClient, Message message)
             else
             {
                 await botClient.SendTextMessageAsync(tgId, "Город прибытия не найден - повторите ввод:");
-                user.InputState = InputState.ArrivalСity;
             }
         }
 
@@ -135,31 +123,26 @@ async Task HandleCommandMessage(ITelegramBotClient botClient, Message message)
         if (user.InputState == InputState.DepartureDate)
         {
             var dateFromMessage = message.Text;
-            var parsedDate = DateTime.Parse(dateFromMessage);
+            DateTime parsedDate;
+            if (DateTime.TryParse(dateFromMessage, out parsedDate))
+            {
+                var flight = FlightsList.flights
+                    .First(x => x.UserTgId == tgId && x.resultTickets == null);
 
-            if (message.Text != null)
-                if (dateFromMessage != null)
-                {
-                    var flight = FlightsList.flights
-                        .Where(x => x.UserTgId == tgId)
-                        .Where(x => x.DepartureDate == null)
-                        .FirstOrDefault();
+                flight.DepartureDate = parsedDate;
 
-                    flight.DepartureDate = parsedDate;
-                }
+                user.InputState = InputState.FullState;
 
-            await botClient.SendTextMessageAsync(tgId, "Ваша дата вылета ");
-            user.InputState = InputState.FullState;
+                var result = GetFinalTickets(flight);
 
-
-            var result = GetFinalTickets();
-            return;
-        }
-
-        else
-        {
-            await botClient.SendTextMessageAsync(tgId, "дата вылета введена неверно - повторите ввод:");
-            user.InputState = InputState.DepartureDate;
+                await botClient.SendTextMessageAsync(tgId, "Результат поиска:\n" + result);
+                return;
+            }
+            else
+            {
+                await botClient.SendTextMessageAsync(tgId,
+                    "дата вылета введена неверно - повторите ввод:в формате  дд.мм.гггг");
+            }
         }
     }
 
@@ -217,7 +200,7 @@ async Task HandleCallbackQuery(ITelegramBotClient botClient, CallbackQuery callb
 }
 
 //Метод вывода найденных результатов по авиарейсам
-async Task<string> GetFinalTickets(Fly fly)
+string GetFinalTickets(Fly fly)
 {
-    return "Билеты найдены!!!";
+    return "Билет из Москвы в Сочи будет завтра за 2000 $";
 }
