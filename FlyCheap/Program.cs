@@ -53,7 +53,7 @@ async Task HandleUpdatesAsync(ITelegramBotClient botClient, Update update, Cance
     }
 }
 
-//Метод ожидающий ввода пользователем команды c inline клавиатуры
+//Метод ожидающий от пользователем ввода сообщения и обрабатывающий их
 async Task HandleCommandMessage(ITelegramBotClient botClient, Message message)
 {
     var tgId = message.From.Id;
@@ -76,7 +76,7 @@ async Task HandleCommandMessage(ITelegramBotClient botClient, Message message)
                 .Where(x => x.Contains(cityFromMessage))
                 .First()
                 .ToString();
-            
+
             if (selectedCityFromList != null)
             {
                 var flight = FlightsList.flights
@@ -89,7 +89,8 @@ async Task HandleCommandMessage(ITelegramBotClient botClient, Message message)
                 flight.DepartureСity = cityFromMessage;
                 flight.Id = guidId;
 
-                await botClient.SendTextMessageAsync(tgId, $"ваш город отправления {cityFromMessage}, теперь введите город назначения:");
+                await botClient.SendTextMessageAsync(tgId,
+                    $"ваш город отправления {cityFromMessage}, теперь введите город назначения:");
                 user.InputState = InputState.ArrivalСity;
                 return;
             }
@@ -108,7 +109,7 @@ async Task HandleCommandMessage(ITelegramBotClient botClient, Message message)
                 .Where(x => x.Contains(cityFromMessage))
                 .First()
                 .ToString();
-                
+
             if (selectedCityFromList != null)
             {
                 var flight = FlightsList.flights
@@ -138,7 +139,17 @@ async Task HandleCommandMessage(ITelegramBotClient botClient, Message message)
                 .Where(x => x.DepartureDate == null)
                 .FirstOrDefault();
 
-            flight.DepartureDate = CitiesCollection.cities.Where(x => x.ToLower().Contains(""));
+            flight.DepartureDate = "";
+
+            await botClient.SendTextMessageAsync(tgId, "Ваша дата вылета ");
+            user.InputState = InputState.FullState;
+            return;
+        }
+
+        else
+        {
+            await botClient.SendTextMessageAsync(tgId, "дата вылета введена неверно - повторите ввод:");
+            user.InputState = InputState.DepartureDate;
         }
 
         //Дату спарсить до datetime

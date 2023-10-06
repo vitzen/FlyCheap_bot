@@ -17,4 +17,5 @@ public enum InputState
     DepartureСity,
     ArrivalСity,
     DepartureDate,
+    FullState
 }
