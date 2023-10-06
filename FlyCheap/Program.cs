@@ -120,7 +120,7 @@ async Task HandleCommandMessage(ITelegramBotClient botClient, Message message)
                 flight.ArrivalСity = cityFromMessage;
 
                 await botClient.SendTextMessageAsync(tgId, $"город прибытия {cityFromMessage}, " +
-                                                           "теперь введите дату отправления в формате  XX.XX.XXXX:");
+                                                           "теперь введите дату отправления в формате  дд.мм.гггг");
                 user.InputState = InputState.DepartureDate;
                 return;
             }
@@ -134,15 +134,25 @@ async Task HandleCommandMessage(ITelegramBotClient botClient, Message message)
         ////////////////////////////////////////////////////////////////////////////////////// ПАРСИМ ДАТУ ВЫЛЕТА
         if (user.InputState == InputState.DepartureDate)
         {
-            var flight = FlightsList.flights
-                .Where(x => x.UserTgId == tgId)
-                .Where(x => x.DepartureDate == null)
-                .FirstOrDefault();
+            var dateFromMessage = message.Text;
+            var parsedDate = DateTime.Parse(dateFromMessage);
+            
+            if (message.Text != null)
+            if (dateFromMessage != null)
+            {
+                var flight = FlightsList.flights
+                    .Where(x => x.UserTgId == tgId)
+                    .Where(x => x.DepartureDate == null)
+                    .FirstOrDefault();
 
-            flight.DepartureDate = "";
+                flight.DepartureDate = "";
+            }
 
             await botClient.SendTextMessageAsync(tgId, "Ваша дата вылета ");
             user.InputState = InputState.FullState;
+            
+            
+            var result = GetFinalTickets();
             return;
         }
 
@@ -210,12 +220,13 @@ async Task HandleCallbackQuery(ITelegramBotClient botClient, CallbackQuery callb
     return;
 }
 
+//Метод вывода найденных результатов по авиарейсам
+async Task<string> GetFinalTickets(Fly fly)
+{
+    return "Билеты найдены";
+}
+
 // Метод который принимает обект fly и возвращает строку с найденными билетами
 //     Эту строку кинуть пользователю после успешного парсинга
 // Сделать обертку всем методам botclient.SendMessageTextAsync
 //     и callback методам
-
-async Task<string> GetFinalTickets(Fly fly)
-{
-    return "";
-}
