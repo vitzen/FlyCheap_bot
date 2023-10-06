@@ -18,16 +18,4 @@ public class Fly
         Id = Guid.NewGuid();
         UserTgId = tgId;
     }
-
-    // public Fly(string departureСity, string arrivalСity, DateTime departureDate, int passengersNumber,
-    //     int transfersNumber, long userTgId)
-    // {
-    //     Id = Guid.NewGuid();
-    //     DepartureСity = departureСity;
-    //     ArrivalСity = arrivalСity;
-    //     DepartureDate = departureDate;
-    //     PassengersNumber = passengersNumber;
-    //     TransfersNumber = transfersNumber;
-    //     UserTgId = userTgId;
-    // }
 }
