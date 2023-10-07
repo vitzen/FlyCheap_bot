@@ -18,11 +18,11 @@ using var cts = new CancellationTokenSource();
 
 var receiverOptions = new ReceiverOptions
 {
-    AllowedUpdates = { }, 
+    AllowedUpdates = { },
     ThrowPendingUpdates = true
 };
 
-// Тест коннекта с ботом TG / Прослушка работы бота
+// Прослушка работы бота
 botClient.StartReceiving(
     HandleUpdatesAsync,
     Exceptions.HandleErrorAsync,
@@ -69,7 +69,7 @@ async Task HandleCommandMessage(ITelegramBotClient botClient, Message message)
 
     if (user.InputState != InputState.Nothing)
     {
-        ////////////////////////////////////////////////////////////////////////////////////// ПАРСИМ ГОРОД ОТПРАВЛЕНИЯ
+        //Парсим город вылета ----->>>>>>>>>>>>>>>>>>>>>>>>
         if (user.InputState == InputState.DepartureСity)
         {
             var cityFromMessage = message.Text.ToLower();
@@ -94,7 +94,7 @@ async Task HandleCommandMessage(ITelegramBotClient botClient, Message message)
             }
         }
 
-        ////////////////////////////////////////////////////////////////////////////////////// ПАРСИМ ГОРОД ПРИБЫТИЯ
+        //Парсим город прибытия ----->>>>>>>>>>>>>>>>>>>>>>>>
         if (user.InputState == InputState.ArrivalСity)
         {
             var cityFromMessage = message.Text.ToLower();
@@ -119,7 +119,7 @@ async Task HandleCommandMessage(ITelegramBotClient botClient, Message message)
             }
         }
 
-        ////////////////////////////////////////////////////////////////////////////////////// ПАРСИМ ДАТУ ВЫЛЕТА
+        //Парсим дату вылета ----->>>>>>>>>>>>>>>>>>>>>>>>
         if (user.InputState == InputState.DepartureDate)
         {
             var dateFromMessage = message.Text;
@@ -202,5 +202,5 @@ async Task HandleCallbackQuery(ITelegramBotClient botClient, CallbackQuery callb
 //Метод вывода найденных результатов по авиарейсам
 string GetFinalTickets(Fly fly)
 {
-    return "Билет из Москвы в Сочи будет завтра за 2000 $";
+    return "Билет из Москвы в Сочи найден";
 }

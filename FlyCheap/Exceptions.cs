@@ -6,7 +6,8 @@ namespace FlyCheap;
 public static class Exceptions
 {
     //Метод для обработки ошибок (бота или API телеграмма)
-    public static Task HandleErrorAsync(ITelegramBotClient client, Exception exception, CancellationToken cancellationToken)
+    public static Task HandleErrorAsync(ITelegramBotClient client, Exception exception,
+        CancellationToken cancellationToken)
     {
         var ErrorMessage = exception switch
         {
@@ -17,5 +18,4 @@ public static class Exceptions
         Console.WriteLine(ErrorMessage);
         return Task.CompletedTask;
     }
-    
 }
