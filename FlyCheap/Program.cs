@@ -1,4 +1,5 @@
-﻿using FlyCheap;
+﻿//Telegram bot FlyCheap
+using FlyCheap;
 using FlyCheap.Collections;
 using FlyCheap.State.Models;
 using FlyCheap.UI;
